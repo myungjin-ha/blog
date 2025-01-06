@@ -1,20 +1,14 @@
-import { getAllPosts } from '@/lib/api';
+import { getAllPosts } from "@/lib/api";
 import {PostPreview} from "@/app/_components/post-preview";
 
-type Props = {
-    params: { category: string };
-};
-
-export default function CategoryPage({ params }: Props) {
-    const { category } = params;
-    const allPosts = getAllPosts();
-    const categoryPosts = allPosts.filter((post) => post.category === category);
+export default async function PostsPage() {
+    const posts = getAllPosts(); // 모든 포스트 데이터 가져오기
 
     return (
         <div>
-            <h1>Posts in "{category}"</h1>
-            <ul>
-                {categoryPosts.map((post) => (
+            <h1>All Posts</h1>
+            <div>
+                {posts.map((post) => (
                     <PostPreview
                         key={post.slug}
                         title={post.title}
@@ -25,7 +19,7 @@ export default function CategoryPage({ params }: Props) {
                         excerpt={post.excerpt}
                     />
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

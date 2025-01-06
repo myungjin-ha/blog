@@ -6,7 +6,6 @@ export default function CategoriesPage() {
     const categories = Array.from(
         new Set(allPosts.map((post) => post.category).filter(Boolean))
     );
-
     return (
         <div>
             <h1>All Categories</h1>

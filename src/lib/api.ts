@@ -26,3 +26,9 @@ export function getAllPosts(): Post[] {
     .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
   return posts;
 }
+export function getPostsByCategory(category: string) {
+  const allPosts = getAllPosts();
+
+  // 카테고리 필터링
+  return allPosts.filter((post) => post.category === category);
+}

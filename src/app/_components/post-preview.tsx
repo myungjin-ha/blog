@@ -11,6 +11,7 @@ type Props = {
   excerpt: string;
   author: Author;
   slug: string;
+  category?: string;
 };
 
 export function PostPreview({
@@ -20,6 +21,7 @@ export function PostPreview({
   excerpt,
   author,
   slug,
+    category,
 }: Props) {
   return (
     <div>
@@ -33,6 +35,7 @@ export function PostPreview({
       </h3>
       <div className="text-lg mb-4">
         <DateFormatter dateString={date} />
+          {category}
       </div>
       <p className="text-lg leading-relaxed mb-4">{excerpt}</p>
       <Avatar name={author.name} picture={author.picture} />

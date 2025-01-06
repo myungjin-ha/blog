@@ -1,47 +1,69 @@
-import Avatar from "@/app/_components/avatar";
-import CoverImage from "@/app/_components/cover-image";
-import { type Author } from "@/interfaces/author";
+"use client";
 import Link from "next/link";
-import DateFormatter from "./date-formatter";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
   title: string;
   coverImage: string;
-  date: string;
-  excerpt: string;
-  author: Author;
   slug: string;
 };
 
-export function HeroPost({
-  title,
-  coverImage,
-  date,
-  excerpt,
-  author,
-  slug,
-}: Props) {
+export function HeroPost({ title, coverImage, slug }: Props) {
+  const [fontSize, setFontSize] = useState(56); // 초기 font-size를 vw로 설정
+  const [isReady, setIsReady] = useState(false); // 폰트 계산 완료 여부
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    const adjustFontSize = () => {
+      const container = titleRef.current?.parentElement;
+      const titleElement = titleRef.current;
+
+      if (container && titleElement) {
+        let newFontSize = fontSize;
+
+        // 폰트 사이즈 줄이기 로직
+        while (
+          titleElement.scrollHeight > container.clientHeight && // 텍스트가 컨테이너를 넘으면
+          newFontSize > 1 // 최소 폰트 크기 제한
+        ) {
+          newFontSize -= 1; // 폰트 크기 1씩 감소
+          titleElement.style.fontSize = `${newFontSize}vw`;
+        }
+
+        setFontSize(newFontSize); // 최종 폰트 크기 저장
+        setIsReady(true); // 계산 완료 상태로 설정
+      }
+    };
+
+    adjustFontSize();
+    window.addEventListener("resize", adjustFontSize); // 화면 크기 변경 시 폰트 크기 재조정
+    return () => window.removeEventListener("resize", adjustFontSize);
+  }, [fontSize]);
+
   return (
-    <section>
-      <div className="mb-8 md:mb-16">
-        <CoverImage title={title} src={coverImage} slug={slug} />
+    <Link href={`/posts/${slug}`}>
+      <div className="flex items-center w-full h-full relative">
+        <Image
+          src={coverImage}
+          alt={`Cover Image for ${title}`}
+          className="object-cover"
+          fill
+        />
+
+        <h3
+          ref={titleRef}
+          className={`font-black leading-[0.92] mix-blend-difference text-orange-600 break-keep absolute inset-0 flex items-center justify-center  ${
+            isReady ? "opacity-100" : "opacity-0"
+          } transition-opacity duration-100`}
+          style={{
+            fontSize: `${fontSize}vw`,
+            letterSpacing: `calc(-${fontSize}vw*0.01)`,
+          }}
+        >
+          {title}
+        </h3>
       </div>
-      <div className="md:grid md:grid-cols-2 md:gap-x-16 lg:gap-x-8 mb-20 md:mb-28">
-        <div>
-          <h3 className="mb-4 text-4xl lg:text-5xl leading-tight">
-            <Link href={`/posts/${slug}`} className="hover:underline">
-              {title}
-            </Link>
-          </h3>
-          <div className="mb-4 md:mb-0 text-lg">
-            <DateFormatter dateString={date} />
-          </div>
-        </div>
-        <div>
-          <p className="text-lg leading-relaxed mb-4">{excerpt}</p>
-          <Avatar name={author.name} picture={author.picture} />
-        </div>
-      </div>
-    </section>
+    </Link>
   );
 }
